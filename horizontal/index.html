@@ -1,0 +1,1083 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recorrido f3nômen4 horizontal</title>
+<!-- Borrador para revisión interna: no indexar, no filtrar el origen y solo cargar lo necesario -->
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; form-action 'none'; base-uri 'none'; object-src 'none'">
+<link rel="icon" href="../assets/FaviconF4.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..700&display=swap" rel="stylesheet">
+<script>
+  // Modo horizontal solo con mouse/trackpad y pantalla ancha; en celular (o con movimiento reducido) queda vertical
+  window.wantHz = () => matchMedia('(min-width: 761px) and (hover: hover) and (pointer: fine)').matches
+    && !matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (wantHz()) document.documentElement.classList.add('hz');
+</script>
+<style>
+  :root {
+    --ink: #0b0a0a;
+    --ink-2: #161312;
+    --cream: #efebe6;
+    --paper: #f7f4f0;
+    --naranja: #FE633D;
+    --rojo: #FE3C00;
+    --ambar: #FF9E00;
+    --amarillo: #FFD700;
+    --muted-dark: rgba(255,255,255,.62);
+    --muted-light: rgba(11,10,10,.6);
+    --gutter: clamp(20px, 5vw, 72px);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: "Bricolage Grotesque", system-ui, sans-serif;
+    background: var(--ink);
+    color: #fff;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  img { display: block; max-width: 100%; }
+  .num { font-variant-numeric: tabular-nums; }
+
+  /* ---------- Fondos de la gráfica de credenciales ---------- */
+  .bg-dark {
+    background:
+      radial-gradient(60% 75% at 100% 100%, rgba(254,99,61,.9) 0%, rgba(254,60,0,.45) 30%, transparent 62%),
+      radial-gradient(40% 40% at 85% 0%, rgba(255,255,255,.08), transparent 70%),
+      linear-gradient(160deg, #141818 0%, var(--ink) 55%, #1d0d08 100%);
+    color: #fff;
+  }
+  .bg-light {
+    background:
+      radial-gradient(70% 55% at 10% 0%, rgba(255,215,0,.75), transparent 60%),
+      radial-gradient(60% 55% at 95% 5%, rgba(254,99,61,.85), transparent 60%),
+      radial-gradient(90% 60% at 50% 30%, rgba(255,158,0,.35), transparent 70%),
+      linear-gradient(180deg, #fff6ea 0%, #ffffff 55%, #ffffff 100%);
+    color: var(--ink);
+  }
+  .bg-fire {
+    background:
+      radial-gradient(70% 90% at 30% 110%, var(--amarillo) 0%, transparent 55%),
+      radial-gradient(80% 80% at 80% 20%, var(--rojo) 0%, transparent 70%),
+      linear-gradient(140deg, #ff8a4a 0%, var(--naranja) 40%, #e8320c 100%);
+    color: #fff;
+  }
+  .grain::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background-image: radial-gradient(rgba(255,255,255,.18) 1px, transparent 1.2px);
+    background-size: 22px 22px;
+    mask-image: radial-gradient(70% 70% at 80% 70%, #000, transparent);
+    opacity: .5;
+  }
+
+  section { position: relative; min-height: 100vh; padding: 0 var(--gutter); overflow: hidden; }
+  .center { display: grid; place-items: center; text-align: center; }
+  .eyebrow { font-size: 12px; letter-spacing: .22em; text-transform: uppercase; opacity: .7; }
+  .display { font-weight: 250; letter-spacing: -.02em; line-height: .95; }
+  .arrow { color: var(--naranja); }
+  .firma { position: absolute; left: 50%; bottom: 28px; transform: translateX(-50%); width: 92px; opacity: .55; }
+  .on-dark .firma, .bg-dark .firma, .bg-fire .firma { filter: brightness(0) invert(1); }
+
+  /* palabras para la revelación (una sola copia del texto, accesible) */
+  .w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .08em; }
+  .w > span { display: inline-block; will-change: transform; }
+
+  /* ---------- Regla superior (línea de tiempo) ---------- */
+  .ruler {
+    position: fixed; inset: 0 0 auto 0; height: 58px; z-index: 50;
+    pointer-events: none; mix-blend-mode: difference; color: #fff;
+  }
+  .ruler .ticks {
+    position: absolute; inset: 0 var(--gutter) auto; height: 14px;
+    background-image: linear-gradient(to right, currentColor 1px, transparent 1px);
+    background-size: 12px 100%; opacity: .5;
+  }
+  .ruler .ticks::after {
+    content: ""; position: absolute; inset: 0;
+    background-image: linear-gradient(to right, currentColor 1px, transparent 1px);
+    background-size: 60px 22px; background-repeat: repeat-x; height: 22px; opacity: 1;
+  }
+  .ruler .marks { position: absolute; inset: 26px var(--gutter) auto; height: 20px; }
+  .ruler .mark {
+    position: absolute; top: -6px; transform: translateX(-50%);
+    font: inherit; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; white-space: nowrap;
+    color: inherit; background: none; border: 0; padding: 6px 6px 10px; cursor: pointer;
+    opacity: .55; pointer-events: auto; transition: opacity .2s;
+  }
+  .ruler .mark:hover, .ruler .mark:focus-visible { opacity: 1; outline: none; }
+  .ruler .mark::after {
+    content: attr(data-name); position: absolute; top: 24px; left: 50%; transform: translate(-50%, -4px);
+    padding: 4px 8px; border: 1px solid currentColor; border-radius: 999px;
+    opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s;
+  }
+  .ruler .mark:hover::after, .ruler .mark:focus-visible::after { opacity: 1; transform: translate(-50%, 0); }
+  .ruler .mark.on { opacity: 1; }
+
+  /* pista en las secciones fijas: en qué paso vas */
+  .pin-hint {
+    position: absolute; top: 72px; left: 50%; transform: translateX(-50%); z-index: 5;
+    display: flex; align-items: center; gap: 10px; white-space: nowrap;
+    font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
+    padding: 8px 14px; border-radius: 999px;
+    background: rgba(11,10,10,.55); color: #fff; backdrop-filter: blur(6px);
+    opacity: 0; transition: opacity .3s;
+  }
+  .pin-hint.on { opacity: 1; }
+  .pin-hint .dots { display: flex; gap: 5px; }
+  .pin-hint .dots i { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,.35); transition: background .3s; }
+  .pin-hint .dots i.on { background: var(--naranja); }
+  .pin-hint .go { opacity: .7; animation: nudge 1.6s ease-in-out infinite; }
+  @keyframes nudge { 50% { transform: translateY(3px); } }
+  .metodo .stage, .fw .stage, .trabajo .stage { position: relative; }
+  .needle {
+    position: absolute; top: 0; left: var(--gutter); width: 2px; height: 30px;
+    background: #01c4f0; /* naranja tras mix-blend difference */
+    transform: translateX(0); will-change: transform;
+  }
+  /* nombre del capítulo: sigue a la aguja pero sin salirse de la pantalla (JS lo acota) */
+  .ruler-label {
+    position: absolute; top: 34px; left: var(--gutter);
+    font-size: 10px; letter-spacing: .14em; color: #01c4f0; white-space: nowrap; will-change: transform;
+  }
+
+  .brand-fixed {
+    position: fixed; top: 70px; left: var(--gutter); z-index: 50; width: 108px;
+    mix-blend-mode: difference; filter: brightness(0) invert(1); opacity: 0;
+  }
+  .cta-fixed {
+    position: fixed; top: 64px; right: var(--gutter); z-index: 50;
+    font: 500 13px/1 "Bricolage Grotesque", sans-serif; letter-spacing: .04em;
+    padding: 12px 18px; border-radius: 999px; background: var(--naranja); color: #fff; text-decoration: none;
+    opacity: 0; transform: translateY(-8px);
+  }
+
+  /* ---------- El hombre que acompaña ---------- */
+  .walker {
+    position: fixed; z-index: 40; left: 0; bottom: 0;
+    height: min(28vh, 250px); aspect-ratio: var(--walker-ratio, .53);
+    pointer-events: none; opacity: 0; will-change: transform;
+  }
+  .walker img { width: 100%; height: 100%; object-fit: contain; object-position: bottom; filter: grayscale(1) contrast(1.15); }
+  .walker .shadow {
+    position: absolute; left: 12%; right: 12%; bottom: 2px; height: 10px; border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(0,0,0,.35), transparent); filter: blur(2px);
+  }
+  /* sobre fondo oscuro: más claro y con halo blanco para que no se pierda */
+  body.on-dark .walker img { filter: grayscale(1) brightness(1.5) contrast(1.1) drop-shadow(0 0 22px rgba(255,255,255,.35)); }
+  body.on-dark .walker .shadow { background: radial-gradient(closest-side, rgba(255,255,255,.3), transparent); }
+
+  /* ---------- 00 Hero ---------- */
+  .hero { background: var(--cream); color: var(--ink); padding: 0; }
+  .hero-media { position: absolute; inset: 0; }
+  .hero-media img { width: 100%; height: 100%; object-fit: cover; object-position: 30% 50%; }
+  .hero-copy { position: relative; z-index: 2; display: grid; place-items: center; min-height: 100vh; text-align: center; }
+  .hero-logo { width: min(64vw, 720px); }
+  .hero-sub { margin-top: 14px; font-size: clamp(14px, 1.4vw, 19px); font-weight: 400; letter-spacing: .04em; }
+  .scroll-hint {
+    position: absolute; z-index: 2; left: 50%; bottom: 28px; transform: translateX(-50%);
+    font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: var(--muted-light);
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+  }
+  .scroll-hint .hint-touch { display: none; }
+  @media (hover: none) { .scroll-hint .hint-keys { display: none; } .scroll-hint .hint-touch { display: inline; } }
+  .scroll-hint i { width: 1px; height: 38px; background: currentColor; transform-origin: top; animation: hint 1.8s ease-in-out infinite; }
+  @keyframes hint { 0% { transform: scaleY(0); } 50% { transform: scaleY(1); } 100% { transform: scaleY(0); transform-origin: bottom; } }
+
+  /* ---------- 01 La ciencia ---------- */
+  .ciencia .display { font-size: clamp(44px, 8.4vw, 132px); text-align: left; }
+  .ciencia .line2 { font-weight: 600; }
+  .ciencia .bajada { margin-top: 28px; font-size: clamp(18px, 2.2vw, 30px); font-weight: 300; color: var(--muted-dark); max-width: 22ch; }
+  .ciencia .wrap { max-width: 1100px; width: 100%; text-align: left; }
+  .ruler .mark.on { visibility: hidden; }
+  /* mientras se ve la pista de pasos, el logo fijo se oculta para no chocar en pantallas chicas */
+  body.hint-on .brand-fixed { visibility: hidden; }
+
+  /* ---------- 02 Marketing science ---------- */
+  .ms { padding-top: 22vh; padding-bottom: 14vh; }
+  .ms h2 { font-size: clamp(48px, 9vw, 150px); }
+  .ms h2 em { font-style: normal; color: var(--naranja); }
+  .ms .lead { margin-top: 26px; font-size: clamp(17px, 1.7vw, 23px); max-width: 34ch; color: var(--muted-light); }
+  .pilares { margin-top: 12vh; display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid rgba(11,10,10,.18); }
+  .pilar { padding: 28px 28px 0 0; }
+  .pilar + .pilar { padding-left: 28px; border-left: 1px solid rgba(11,10,10,.18); }
+  .pilar h3 { font-weight: 300; font-size: clamp(24px, 2.6vw, 38px); letter-spacing: .02em; text-transform: uppercase; }
+  .pilar p { margin-top: 12px; font-size: 15px; line-height: 1.5; color: var(--muted-light); max-width: 30ch; }
+  .pilar svg { width: 34px; height: 34px; stroke: var(--naranja); fill: none; stroke-width: 1.4; margin-bottom: 18px; }
+
+  /* ---------- 03 D-3motion (pin + pasos) ---------- */
+  .metodo { padding: 0; }
+  .metodo .stage { height: 100vh; display: grid; grid-template-rows: auto 1fr; padding: 16vh var(--gutter) 10vh; }
+  .metodo .titulo { display: flex; justify-content: space-between; align-items: end; gap: 24px; flex-wrap: wrap; }
+  .metodo h2 { font-size: clamp(48px, 9vw, 150px); font-weight: 250; line-height: .9; }
+  .metodo .tag { font-size: clamp(16px, 1.6vw, 22px); max-width: 30ch; font-weight: 400; }
+  .metodo .tag b { font-weight: 650; }
+  .pasos { align-self: end; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-top: 1px solid rgba(255,255,255,.35); }
+  .paso { padding: 24px 24px 0 0; opacity: .28; transition: opacity .5s ease; }
+  .paso + .paso { padding-left: 24px; border-left: 1px solid rgba(255,255,255,.35); }
+  .paso.on { opacity: 1; }
+  .paso .k { font-size: 12px; letter-spacing: .2em; text-transform: uppercase; }
+  .paso h3 { margin: 10px 0 12px; font-size: clamp(22px, 2.4vw, 34px); font-weight: 600; }
+  .paso p { font-size: 15px; line-height: 1.5; max-width: 36ch; }
+  .paso .cafe { margin-top: 14px; padding-top: 14px; border-top: 1px dashed rgba(255,255,255,.4); font-size: 14px; line-height: 1.5; opacity: .9; }
+
+  /* ---------- 04 Framework (órbita) ---------- */
+  .fw { padding: 0; }
+  .fw .stage { height: 100vh; display: grid; grid-template-columns: 1.1fr 1fr; align-items: center; gap: 4vw; padding: 12vh var(--gutter) 8vh; }
+  .orbita { position: relative; aspect-ratio: 1; width: min(42vw, 72vh); justify-self: center; }
+  .orbita svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .orbita .ring { fill: none; stroke: rgba(255,255,255,.35); stroke-width: .6; }
+  .orbita .ring-on { fill: none; stroke: var(--naranja); stroke-width: 1.4; stroke-linecap: round; }
+  .orbita .core { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; }
+  .orbita .core b { font-weight: 250; font-size: clamp(30px, 4vw, 60px); line-height: .9; letter-spacing: -.01em; }
+  .nodo {
+    position: absolute; transform: translate(-50%, -50%);
+    font-size: 12px; letter-spacing: .16em; text-transform: uppercase; white-space: nowrap;
+    padding: 8px 12px; border-radius: 999px; border: 1px solid rgba(255,255,255,.35); background: rgba(11,10,10,.6);
+    transition: background .4s, border-color .4s, color .4s;
+  }
+  .nodo.on { background: var(--naranja); border-color: var(--naranja); }
+  .fw-texto { position: relative; min-height: 260px; }
+  .fw-item { position: absolute; inset: 0; opacity: 0; transform: translateY(16px); transition: opacity .45s, transform .45s; }
+  .fw-item.on { opacity: 1; transform: none; }
+  .fw-item .k { color: var(--naranja); font-size: 12px; letter-spacing: .2em; text-transform: uppercase; }
+  .fw-item h3 { margin: 12px 0 16px; font-size: clamp(40px, 5.5vw, 84px); font-weight: 250; line-height: .95; }
+  .fw-item p { font-size: clamp(16px, 1.4vw, 19px); line-height: 1.55; color: var(--muted-dark); max-width: 40ch; }
+
+  /* ---------- 05 Certeza ---------- */
+  .certeza h2 { font-size: clamp(64px, 17vw, 300px); font-weight: 250; color: var(--naranja); letter-spacing: -.03em; line-height: .85; }
+  .azar { display: grid; place-items: center; text-align: center; }
+  .azar p { font-size: clamp(30px, 5vw, 76px); font-weight: 300; line-height: 1.08; max-width: 18ch; letter-spacing: -.01em; }
+  .azar p b { font-weight: 600; }
+  .azar p em { font-style: normal; color: var(--naranja); }
+
+  /* ---------- 06 Números ---------- */
+  .numeros { padding-top: 18vh; padding-bottom: 14vh; }
+  .numeros .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 9vh 6vw; max-width: 1200px; margin: 0 auto; }
+  .stat { border-left: 1px solid var(--naranja); padding-left: 22px; }
+  .stat .de { font-size: 13px; letter-spacing: .2em; text-transform: uppercase; opacity: .7; }
+  .stat .v { display: block; font-size: clamp(64px, 10vw, 160px); font-weight: 250; line-height: .9; color: var(--naranja); letter-spacing: -.02em; }
+  .stat .u { font-size: clamp(22px, 2.6vw, 38px); font-weight: 300; text-transform: uppercase; letter-spacing: .02em; }
+  .stat p { margin-top: 10px; color: var(--muted-dark); font-size: 15px; max-width: 30ch; }
+
+  /* ---------- 07 Donde otros ven datos ---------- */
+  .ven .display { font-size: clamp(40px, 7vw, 116px); }
+  .ven .b { font-weight: 600; }
+  .ven .r { color: var(--naranja); font-weight: 400; text-transform: uppercase; letter-spacing: .01em; }
+
+  /* ---------- 08 Trabajo (horizontal) ---------- */
+  .trabajo { padding: 0; }
+  .trabajo .stage { height: 100vh; display: flex; flex-direction: column; justify-content: center; gap: 6vh; padding: 14vh 0 10vh; }
+  .trabajo .head { padding: 0 var(--gutter); display: flex; justify-content: space-between; align-items: end; gap: 20px; flex-wrap: wrap; }
+  .trabajo h2 { font-size: clamp(56px, 10vw, 170px); font-weight: 250; line-height: .85; }
+  .trabajo .head p { max-width: 32ch; font-size: 16px; opacity: .85; }
+  .rail { display: flex; gap: 22px; padding: 0 var(--gutter); width: max-content; will-change: transform; }
+  .caso {
+    position: relative; width: min(78vw, 460px); min-height: 50vh; border-radius: 22px; padding: 28px;
+    display: flex; flex-direction: column; justify-content: space-between; overflow: hidden;
+    background: rgba(11,10,10,.82); border: 1px solid rgba(255,255,255,.14);
+  }
+  .caso::before { content: ""; position: absolute; inset: auto -30% -50% auto; width: 90%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(closest-side, var(--c, var(--naranja)), transparent); opacity: .55; }
+  .caso > * { position: relative; }
+  .caso .cliente { font-size: 12px; letter-spacing: .2em; text-transform: uppercase; opacity: .7; }
+  .caso h3 { margin-top: 10px; font-size: clamp(26px, 2.6vw, 38px); font-weight: 400; line-height: 1.02; }
+  .caso p { font-size: 15px; line-height: 1.5; color: var(--muted-dark); }
+  .caso .dato { font-size: clamp(40px, 4.6vw, 64px); font-weight: 250; color: var(--naranja); line-height: 1; }
+  .caso .dato small { display: block; font-size: 13px; color: #fff; opacity: .7; margin-top: 6px; letter-spacing: .02em; }
+
+  /* ---------- 09 Clientes ---------- */
+  .clientes { padding-top: 18vh; padding-bottom: 16vh; text-align: center; }
+  .clientes h2 { font-size: clamp(36px, 5vw, 72px); font-weight: 250; }
+  .clientes h2 em { font-style: normal; color: var(--naranja); }
+  .logos { margin: 9vh auto 0; max-width: 1100px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 46px 30px; align-items: center; }
+  /* los PNG vienen en grises claros y algunos en lienzo cuadrado: se pasan a negro parejo y más altos */
+  .logos img { height: 56px; width: 100%; max-width: 170px; margin: 0 auto; object-fit: contain; filter: brightness(0); opacity: .78; }
+  .logos img.badge { filter: grayscale(1); opacity: .9; } /* tiene fondo propio: pasarlo a negro lo vuelve un bloque */
+
+  /* ---------- 10 Cierre ---------- */
+  .cierre { display: grid; place-items: center; text-align: center; }
+  .cierre h2 { font-size: clamp(44px, 8vw, 130px); font-weight: 250; line-height: .95; letter-spacing: -.02em; }
+  .cierre h2 b { font-weight: 600; }
+  .cierre p { margin-top: 22px; color: var(--muted-light); font-size: 18px; }
+  .btn { display: inline-flex; align-items: center; gap: 10px; margin-top: 36px; padding: 18px 28px; border-radius: 999px; background: var(--ink); color: #fff; text-decoration: none; font-weight: 500; font-size: 16px; }
+  .btn span { color: var(--naranja); }
+
+  .proto-badge {
+    position: fixed; right: 16px; bottom: 16px; z-index: 60; font-size: 11px; letter-spacing: .08em;
+    padding: 8px 12px; border-radius: 999px; background: #fff; color: var(--ink); box-shadow: 0 2px 12px rgba(0,0,0,.15);
+  }
+  .proto-badge i { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--naranja); margin-right: 6px; }
+
+  /* ---------- Móvil ---------- */
+  @media (max-width: 760px) {
+    .ruler .marks { display: none; }
+    .pilares, .pasos, .numeros .grid { grid-template-columns: 1fr; }
+    .pilar + .pilar, .paso + .paso { padding-left: 0; border-left: 0; border-top: 1px solid rgba(127,127,127,.3); margin-top: 22px; }
+    .metodo .stage, .fw .stage { height: auto; min-height: 100vh; }
+    .paso { opacity: 1; }
+    .fw .stage { grid-template-columns: 1fr; }
+    .orbita { width: 82vw; }
+    .fw-texto { min-height: 300px; }
+    .logos { grid-template-columns: repeat(2, 1fr); }
+    .walker { height: 15vh; }
+    .walker img { opacity: .9; }
+    .logos { gap: 28px 20px; }
+    .logos img { height: 44px; max-width: 140px; }
+    .pin-hint { left: var(--gutter); transform: none; top: 66px; font-size: 10px; letter-spacing: .1em; padding: 7px 12px; }
+    .proto-badge { font-size: 10px; padding: 6px 10px; right: 10px; bottom: 10px; }
+    .hero-media img { object-position: 42% 50%; }
+    .brand-fixed { width: 84px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .scroll-hint i { animation: none; }
+    .paso, .fw-item { transition: none; }
+  }
+
+  /* el hombre se da vuelta cuando retrocedes */
+  .walker img { transition: transform .3s ease; }
+  .walker img.back { transform: scaleX(-1); }
+  .proto-badge a { color: var(--naranja); margin-left: 8px; text-decoration: none; font-weight: 600; }
+
+  /* ---------- Índice a pantalla completa (estilo Samy) ---------- */
+  .menu-btn {
+    position: fixed; top: 60px; right: var(--gutter); z-index: 70;
+    width: 46px; height: 46px; border-radius: 50%; cursor: pointer;
+    border: 1px solid rgba(255,255,255,.3); background: rgba(11,10,10,.55); backdrop-filter: blur(6px);
+    display: grid; place-content: center; gap: 5px;
+  }
+  .menu-btn i { display: block; width: 18px; height: 1.5px; background: #fff; transition: transform .35s; }
+  .menu-open .menu-btn i:first-child { transform: translateY(3.25px) rotate(45deg); }
+  .menu-open .menu-btn i:last-child { transform: translateY(-3.25px) rotate(-45deg); }
+  .cta-fixed { right: calc(var(--gutter) + 58px); }
+  .indice {
+    position: fixed; inset: 0; z-index: 65; overflow-y: auto; color: #fff;
+    padding: 130px var(--gutter) 60px;
+    background:
+      radial-gradient(60% 75% at 100% 100%, rgba(254,99,61,.9) 0%, rgba(254,60,0,.45) 30%, transparent 62%),
+      linear-gradient(160deg, #141818 0%, var(--ink) 55%, #1d0d08 100%);
+    transform: translateX(-100%); visibility: hidden;
+    transition: transform .7s cubic-bezier(.7,0,.2,1), visibility 0s .7s;
+  }
+  .menu-open .indice { transform: none; visibility: visible; transition: transform .7s cubic-bezier(.7,0,.2,1); }
+  .menu-open, .menu-open body { overflow: hidden; }
+  .indice .eyebrow { margin-bottom: 24px; }
+  .indice ol { list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(6, auto); grid-auto-flow: column; gap: 0 6vw; max-width: 1200px; }
+  .indice li { border-top: 1px solid rgba(255,255,255,.16); }
+  .indice button {
+    all: unset; box-sizing: border-box; width: 100%; cursor: pointer;
+    display: flex; align-items: baseline; gap: 18px; padding: 14px 0;
+    font-size: clamp(26px, 3.4vw, 50px); font-weight: 250; letter-spacing: -.01em;
+    transition: color .2s, transform .3s;
+  }
+  .indice button small { font-size: 12px; letter-spacing: .16em; opacity: .6; font-weight: 400; }
+  .indice button:hover, .indice button:focus-visible { color: var(--naranja); transform: translateX(8px); }
+  .indice button[aria-current="true"] { color: var(--naranja); }
+  .indice .pie { margin-top: 40px; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; opacity: .6; }
+  @media (max-width: 760px) {
+    .indice { padding-top: 116px; }
+    .indice ol { grid-template-columns: 1fr; grid-template-rows: none; grid-auto-flow: row; }
+    .indice button { font-size: 26px; padding: 11px 0; }
+  }
+
+  /* ---------- Modo horizontal: la página entera avanza hacia el lado ---------- */
+  .hz .hz-viewport { position: fixed; inset: 0; overflow: hidden; }
+  .hz main { position: relative; display: flex; height: 100vh; width: max-content; will-change: transform; cursor: grab; }
+  .hz main > section { flex: none; width: 100vw; height: 100vh; min-height: 0; }
+  .hz img { -webkit-user-drag: none; }
+  .hz.dragging, .hz.dragging * { cursor: grabbing !important; user-select: none; }
+  .hz .ms { padding-top: 15vh; }
+  .hz .pilares { margin-top: 7vh; }
+  .hz .numeros { width: 150vw; display: grid; align-content: center; padding-top: 0; padding-bottom: 0; }
+  .hz .numeros .grid { grid-template-columns: repeat(4, 1fr); max-width: none; width: 100%; margin: 0; }
+  .hz .stat .v { font-size: clamp(56px, 7vw, 120px); }
+  .hz .trabajo { width: auto; }
+  .hz .trabajo .stage { flex-direction: row; align-items: center; gap: 5vw; padding: 12vh var(--gutter) 10vh; }
+  .hz .trabajo .head { flex: none; width: 32vw; flex-direction: column; align-items: start; padding: 0; }
+  .hz .trabajo h2 { font-size: clamp(56px, 8vw, 140px); }
+  .hz .rail { padding: 0; }
+  .hz .caso { min-height: 60vh; }
+  .hz .clientes { padding-top: 16vh; }
+</style>
+</head>
+<body>
+
+<!-- Regla superior: progreso por capítulos -->
+<nav class="ruler" aria-label="Capítulos">
+  <div class="ticks" aria-hidden="true"></div>
+  <div class="marks" id="marks"></div>
+  <div class="needle" id="needle" aria-hidden="true"></div>
+  <div class="ruler-label" id="rulerLabel" aria-hidden="true">00 · Inicio</div>
+</nav>
+<img class="brand-fixed" id="brandFixed" src="../assets/Fenomena_logo_web.png" alt="" aria-hidden="true">
+<a class="cta-fixed" id="ctaFixed" href="https://fenomena.cl/#contacto">Conversemos</a>
+<button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="indice" aria-label="Abrir índice"><i></i><i></i></button>
+<nav class="indice" id="indice" aria-label="Índice" aria-hidden="true" inert>
+  <p class="eyebrow">Índice del recorrido</p>
+  <ol></ol>
+  <p class="pie">Esc para cerrar</p>
+</nav>
+
+<!-- El hombre que acompaña el recorrido -->
+<div class="walker" id="walker" aria-hidden="true">
+  <div class="shadow"></div>
+  <img src="../assets/hombre-recorte.webp" alt="">
+</div>
+
+<div class="hz-viewport">
+<main>
+  <!-- 00 -->
+  <section class="hero" data-chapter="Inicio" data-theme="light">
+    <div class="hero-media"><img id="heroGif" src="../assets/hombre-portada.webp" alt="Hombre con traje naranja caminando sobre un fondo de datos"></div>
+    <div class="hero-copy">
+      <div>
+        <h1><img class="hero-logo" src="../assets/Fenomena_logo_web.png" alt="f3nômen4"></h1>
+        <p class="hero-sub">Creative / Data</p>
+      </div>
+    </div>
+    <div class="scroll-hint"><span class="hint-keys">Baja, arrastra o usa las flechas →</span><span class="hint-touch">Desliza ↓</span> <i></i></div>
+  </section>
+
+  <!-- 01 -->
+  <section class="ciencia bg-dark grain center" data-chapter="La ciencia" data-theme="dark">
+    <div class="wrap">
+      <p class="display reveal">La ciencia</p>
+      <p class="display line2 reveal"><span class="arrow">→</span> de las ideas.</p>
+      <p class="bajada reveal-soft">Hacemos que las ideas aprendan, se adapten y evolucionen.</p>
+    </div>
+    <img class="firma" src="../assets/Fenomena_logo_web.png" alt="">
+  </section>
+
+  <!-- 02 -->
+  <section class="ms bg-light" data-chapter="Marketing science" data-theme="light">
+    <p class="eyebrow">Qué hacemos</p>
+    <h2 class="display reveal">M4RKETING<br>SC1ENCE<em>_</em></h2>
+    <p class="lead reveal-soft">Convertimos datos en conocimiento, conocimiento en ideas e ideas en resultados.</p>
+    <div class="pilares">
+      <article class="pilar reveal-soft">
+        <svg viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/></svg>
+        <h3>Creativid4d</h3>
+        <p>Transformamos el conocimiento en ideas que conectan con las personas y mueven el negocio.</p>
+      </article>
+      <article class="pilar reveal-soft">
+        <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg>
+        <h3>D4tos</h3>
+        <p>Analizamos para encontrar las verdades detrás de lo que las personas hacen. Basta de suposiciones.</p>
+      </article>
+      <article class="pilar reveal-soft">
+        <svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></svg>
+        <h3>Tecnologí4</h3>
+        <p>Creamos plataformas que aprenden, se adaptan y mejoran en tiempo real.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- 03 -->
+  <section class="metodo bg-fire grain" id="metodo" data-chapter="Metodología" data-theme="dark">
+    <div class="stage">
+      <div class="titulo">
+        <h2 class="reveal">M3TODOLOGÍA</h2>
+        <p class="tag">La data te da la base, <b>pero quedarte ahí te hace predecible.</b> Con <b>D-3motion</b> (Data + Emoción) descubrimos el “lado B” de tus números.</p>
+      </div>
+      <div class="pasos">
+        <article class="paso">
+          <p class="k">01 · La data</p>
+          <h3>Dónde estamos parados</h3>
+          <p>Miramos los números para saber exactamente dónde estamos.</p>
+          <p class="cafe">La gente toma café para activarse y ser productiva. Lo tradicional: una promo matutina enfocada en energía. Correcto, pero predecible.</p>
+        </article>
+        <article class="paso">
+          <p class="k">02 · El eureka</p>
+          <h3>Damos vuelta la información</h3>
+          <p>Vemos lo mismo que los demás, pero encontramos el camino que tu competencia no ve.</p>
+          <p class="cafe">Hablamos de lo que el café hace por las personas, no de lo que hacen mientras lo toman. Por estar siempre haciendo cosas, dejamos de disfrutarlo.</p>
+        </article>
+        <article class="paso">
+          <p class="k">03 · La idea</p>
+          <h3>Pura creatividad</h3>
+          <p>Convertimos ese descubrimiento en una idea que se siente.</p>
+          <p class="cafe">“Toma café como si fuera domingo”: 10 minutos sin hacer nada, sin celular y sin productividad.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 -->
+  <section class="fw bg-dark" id="fw" data-chapter="Fram3work" data-theme="dark">
+    <div class="stage">
+      <div class="orbita" id="orbita">
+        <svg viewBox="0 0 100 100" aria-hidden="true">
+          <circle class="ring" cx="50" cy="50" r="40"/>
+          <circle class="ring-on" id="ringOn" cx="50" cy="50" r="40" transform="rotate(-90 50 50)" pathLength="1" stroke-dasharray="0 1"/>
+        </svg>
+        <div class="core"><b>FRAM3<br>W0RK</b></div>
+      </div>
+      <div class="fw-texto" id="fwTexto">
+        <article class="fw-item on"><p class="k">01 · Revelación de evidencia</p><h3>MIND 4D</h3><p>Un modelo analítico de 4 dimensiones que deja atrás las suposiciones: te mostramos si lo que tu consumidor siente por la marca se traduce en acciones concretas.</p></article>
+        <article class="fw-item"><p class="k">02 · Modelamiento predictivo</p><h3>FOR3CAST</h3><p>Pasa de analizar el pasado a predecir tu éxito. Diseñamos la estrategia con ciencia de datos para simular escenarios y bajar la incertidumbre.</p></article>
+        <article class="fw-item"><p class="k">03 · Desarrollo de la big idea</p><h3>FL4ME</h3><p>De los datos a la big idea. Desbloqueamos el valor emocional de tu marca para que tu mensaje no solo se vea, sino que se sienta.</p></article>
+        <article class="fw-item"><p class="k">04 · Experimentación y escalamiento</p><h3>SPR1NTS</h3><p>Menos riesgo, más impacto. Pruebas de campo controladas hasta dar con la variante creativa exacta que hace crecer a tu marca.</p></article>
+        <article class="fw-item"><p class="k">05 · Aprendizaje continuo</p><h3>BR4ND MIND 4D</h3><p>Cada campaña alimenta un “cerebro” exclusivo de tu negocio, para que la próxima estrategia arranque con ventaja y nunca desde cero.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 -->
+  <section class="certeza bg-dark grain center" data-chapter="Certeza" data-theme="dark">
+    <h2 class="reveal">CERTEZ4</h2>
+  </section>
+  <section class="azar bg-light" data-chapter="Por diseño" data-theme="light">
+    <p class="reveal">Nada de lo que hacemos por tu marca ocurre por azar. <b>En f3nômen4 ocurre por <em>diseño.</em></b></p>
+  </section>
+
+  <!-- 06 -->
+  <section class="numeros bg-dark" data-chapter="Números" data-theme="dark">
+    <div class="grid">
+      <div class="stat"><span class="de">De</span><span class="v num" data-count="15">0</span><span class="u">años</span><p>trabajando creatividad y marketing.</p></div>
+      <div class="stat"><span class="de">De</span><span class="v num" data-count="2500" data-prefix="$">0</span><span class="u">millones</span><p>invertidos en medios en los últimos 24 meses.</p></div>
+      <div class="stat"><span class="de">De</span><span class="v num" data-count="68">0</span><span class="u">marcas</span><p>han confiado en nosotros.</p></div>
+      <div class="stat"><span class="de">+</span><span class="v num" data-count="120000">0</span><span class="u">leads</span><p>a través de campañas exitosas.</p></div>
+    </div>
+  </section>
+
+  <!-- 07 -->
+  <section class="ven bg-dark grain center" data-chapter="Resultados" data-theme="dark">
+    <div>
+      <p class="display reveal">Donde otros ven <span class="arrow">→</span> <span class="b">datos,</span></p>
+      <p class="display r reveal" style="margin-top:.3em">nosotros vemos resultados futuros.</p>
+    </div>
+  </section>
+
+  <!-- 08 -->
+  <section class="trabajo bg-fire" id="trabajo" data-chapter="Tr4bajo" data-theme="dark">
+    <div class="stage">
+      <div class="head">
+        <h2>TR4BAJO</h2>
+        <p>Ideas que nacen de un dato y terminan moviendo el negocio.</p>
+      </div>
+      <div class="rail" id="rail">
+        <article class="caso" style="--c:#00BA95"><div><p class="cliente">Volvo Trucks</p><h3>Iron Women</h3></div><p>El oficio de camionero se hereda de generación en generación y deja fuera a muchas mujeres. Creamos un programa para entregarles las herramientas que no heredaron.</p><p class="dato num">+211%<small>inscripciones vs. edición anterior · Premio EIKON</small></p></article>
+        <article class="caso" style="--c:#ff7094"><div><p class="cliente">Volvo Camiones y Buses</p><h3>Señaléticas del autocuidado</h3></div><p>Solo 4 de cada 10 mujeres se hace una mamografía preventiva anual. Transformamos el lenguaje de seguridad de la ruta en un tutorial de autoexamen.</p><p class="dato">4 de 10<small>el dato que dio origen a la idea</small></p></article>
+        <article class="caso" style="--c:#D0EE4C"><div><p class="cliente">Banquete</p><h3>Actualizamos las legumbres</h3></div><p>Todos queremos comer legumbres, pero dejarlas remojando la noche anterior ya no es para cualquiera. Hablamos desde la innovación: el futuro de las legumbres.</p><p class="dato">Nuevo estándar<small>innovación en una categoría tradicional</small></p></article>
+        <article class="caso" style="--c:#FFD700"><div><p class="cliente">Tucapel</p><h3>85 años</h3></div><p>Nadie sabe lo que tiene hasta que lo pierde. Una campaña para recordar el lugar del arroz en la mesa chilena.</p><p class="dato num">+25MM<small>views · 87% de views al 100%</small></p></article>
+        <article class="caso" style="--c:#004BDA"><div><p class="cliente">Fundación Sembrar Futuro</p><h3>La guerra invisible</h3></div><p>Un niño sin vínculos seguros puede vivir niveles de estrés comparables a los de un soldado en guerra. Llevamos esa guerra invisible a los lugares donde debería sentirse seguro.</p><p class="dato">Zona segura<small>del dato social a la calle</small></p></article>
+        <article class="caso" style="--c:#FE633D"><div><p class="cliente">UACh</p><h3>Admisión 2025</h3></div><p>Una admisión difícil, transformada con data y creatividad en un resultado histórico.</p><p class="dato num">3.783<small>matriculados · +58% vs. admisión anterior</small></p></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 09 -->
+  <section class="clientes bg-light" data-chapter="Clientes" data-theme="light">
+    <h2 class="reveal">Cl1entes <em>que confían</em> en nosotros</h2>
+    <div class="logos">
+      <img src="../assets/clientes/cenco.png" alt="Cencosud">
+      <img src="../assets/clientes/volvo.png" alt="Volvo">
+      <img src="../assets/clientes/surlat.png" alt="Surlat">
+      <img src="../assets/clientes/tucapel.png" alt="Tucapel">
+      <img class="badge" src="../assets/clientes/banquete.png" alt="Banquete">
+      <img src="../assets/clientes/uach.png" alt="Universidad Austral de Chile">
+      <img src="../assets/clientes/proyeccion.png" alt="Inmobiliaria Proyección">
+      <img src="../assets/clientes/sembrar-futuro.png" alt="Fundación Sembrar Futuro">
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section class="cierre bg-light" data-chapter="Conversemos" data-theme="light">
+    <div>
+      <h2 class="reveal">Tu próxima idea<br><b>ya está en tus datos.</b></h2>
+      <p class="reveal-soft">Vamos a encontrarla juntos.</p>
+      <a class="btn" href="https://fenomena.cl/#contacto">Conversemos <span>→</span></a>
+    </div>
+    <img class="firma" src="../assets/Fenomena_logo_web.png" alt="">
+  </section>
+</main>
+</div>
+<!-- en modo horizontal da el largo de scroll que mueve la franja -->
+<div id="hzSpace" aria-hidden="true"></div>
+
+<div class="proto-badge"><i></i>Prototipo B · horizontal<a href="../index.html">ver versión A</a></div>
+
+<!-- integrity: si el CDN entregara otro archivo, el navegador no lo ejecuta -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" integrity="sha512-7eHRwcbYkK4d9g/6tD/mhkf++eoTHwpNM9woBxtPUBWm67zeAfFC+HrdoE2GanKeocly/VxeLvIqwvCdk7qScg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" integrity="sha512-onMTRKJBKz8M1TnqqDuGBlowlH0ohFzMXYRNebz+yOcc5TQr/zAKsthzhuv0hiyUKEiQEQXEynnXCvNTOk50dg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isMobile = matchMedia('(max-width: 760px)').matches;
+  const HZ = document.documentElement.classList.contains('hz');
+  const sections = [...document.querySelectorAll('main > section')];
+  const pad = i => String(i).padStart(2, '0');
+
+  // Si cambia el tipo de pantalla (p. ej. se achica la ventana), se recarga en el modo que corresponde
+  addEventListener('resize', () => { if (wantHz() !== HZ) location.reload(); });
+
+  // ---- Regla: una marca por capítulo, posicionada según dónde empieza cada sección
+  const marks = document.getElementById('marks');
+  const needle = document.getElementById('needle');
+  const rulerLabel = document.getElementById('rulerLabel');
+  const markEls = sections.map((s, i) => {
+    const m = document.createElement('button');
+    m.type = 'button';
+    m.className = 'mark';
+    m.textContent = pad(i);
+    m.dataset.name = s.dataset.chapter;
+    m.setAttribute('aria-label', 'Ir a ' + s.dataset.chapter);
+    m.addEventListener('click', () => jump(i));
+    marks.appendChild(m);
+    return m;
+  });
+  function goTo(y) {
+    // +2px para quedar dentro de la sección (y activar su pin) y no justo en el borde
+    scrollTo({ top: Math.ceil(y) + 2, behavior: reduce ? 'auto' : 'smooth' });
+  }
+  // cada modo define cómo saltar a un capítulo y dónde quedan las marcas
+  let jump = i => goTo(sections[i].getBoundingClientRect().top + scrollY);
+  let layoutMarks = () => {
+    const max = document.documentElement.scrollHeight - innerHeight;
+    sections.forEach((s, i) => {
+      const p = Math.min(1, s.offsetTop / max);
+      markEls[i].style.left = (p * 100) + '%';
+    });
+  };
+  let current = 0;
+  function setChapter(idx) {
+    current = idx;
+    rulerLabel.textContent = pad(idx) + ' · ' + sections[idx].dataset.chapter;
+    markEls.forEach((m, i) => m.classList.toggle('on', i === idx));
+    setTheme(sections[idx].dataset.theme === 'dark');
+  }
+
+  // ---- Índice a pantalla completa
+  const menuBtn = document.getElementById('menuBtn');
+  const indice = document.getElementById('indice');
+  const itemBtns = sections.map((s, i) => {
+    const li = document.createElement('li');
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.innerHTML = `<small>${pad(i)}</small>`;
+    b.append(s.dataset.chapter);
+    b.addEventListener('click', () => { setMenu(false); jump(i); });
+    li.appendChild(b);
+    indice.querySelector('ol').appendChild(li);
+    return b;
+  });
+  const menuOpen = () => document.documentElement.classList.contains('menu-open');
+  function setMenu(open) {
+    document.documentElement.classList.toggle('menu-open', open);
+    menuBtn.setAttribute('aria-expanded', open);
+    menuBtn.setAttribute('aria-label', open ? 'Cerrar índice' : 'Abrir índice');
+    indice.setAttribute('aria-hidden', !open);
+    indice.inert = !open;
+    if (open) {
+      itemBtns.forEach((b, i) => b.setAttribute('aria-current', i === current));
+      itemBtns[current].focus({ preventScroll: true });
+    } else {
+      menuBtn.focus({ preventScroll: true });
+    }
+  }
+  menuBtn.addEventListener('click', () => setMenu(!menuOpen()));
+
+  // ---- Separar palabras para revelarlas (el texto queda una sola vez en el DOM)
+  function splitWords(el) {
+    const walk = node => {
+      [...node.childNodes].forEach(n => {
+        if (n.nodeType === 3) {
+          const frag = document.createDocumentFragment();
+          n.textContent.split(/(\s+)/).forEach(t => {
+            if (!t) return;
+            if (/^\s+$/.test(t)) { frag.appendChild(document.createTextNode(t)); return; }
+            const w = document.createElement('span'); w.className = 'w';
+            const i = document.createElement('span'); i.textContent = t;
+            w.appendChild(i); frag.appendChild(w);
+          });
+          n.replaceWith(frag);
+        } else if (n.nodeType === 1 && n.tagName !== 'BR') walk(n);
+      });
+    };
+    walk(el);
+  }
+
+  // ---- Tema del body (para el hombre y la regla)
+  function setTheme(dark) { document.body.classList.toggle('on-dark', dark); }
+
+  const walker = document.getElementById('walker');
+  const walkerImg = walker.querySelector('img');
+  walkerImg.addEventListener('load', () => {
+    walker.style.setProperty('--walker-ratio', walkerImg.naturalWidth / walkerImg.naturalHeight);
+  });
+  // el hombre mira hacia donde vas
+  let lastY = scrollY;
+  function face() {
+    if (scrollY !== lastY) walkerImg.classList.toggle('back', scrollY < lastY);
+    lastY = scrollY;
+  }
+
+  // ---- Teclado: flechas / AvPág / espacio avanzan de parada en parada
+  let stops = () => [];
+  addEventListener('keydown', e => {
+    if (menuOpen()) { if (e.key === 'Escape') setMenu(false); return; }
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const t = e.target;
+    const typing = t.closest && t.closest('input, textarea, select, [contenteditable]');
+    if (typing) return;
+    const space = e.key === ' ' && !t.closest('a, button');
+    let dir = 0;
+    if (['ArrowDown', 'ArrowRight', 'PageDown'].includes(e.key) || (space && !e.shiftKey)) dir = 1;
+    if (['ArrowUp', 'ArrowLeft', 'PageUp'].includes(e.key) || (space && e.shiftKey)) dir = -1;
+    if (!dir) return;
+    e.preventDefault();
+    const y = scrollY, list = stops();
+    const next = dir > 0 ? list.find(s => s > y + 4) : [...list].reverse().find(s => s < y - 4);
+    if (next !== undefined) goTo(next);
+  });
+
+  if (!window.gsap || reduce) {
+    document.documentElement.classList.remove('hz');
+    walker.style.opacity = 1;
+    walker.style.transform = 'translateX(24px)';
+    document.querySelectorAll('.paso, .fw-item').forEach(e => e.classList.add('on'));
+    document.querySelectorAll('[data-count]').forEach(e => e.textContent = (e.dataset.prefix || '') + Number(e.dataset.count).toLocaleString('es-CL'));
+    layoutMarks();
+    return;
+  }
+
+  // ---- Pista "paso k / n" para las secciones fijas
+  function makeHint(stage, n, noun) {
+    const el = document.createElement('div');
+    el.className = 'pin-hint';
+    el.setAttribute('aria-hidden', 'true');
+    el.innerHTML = '<span class="txt"></span><span class="dots">' + '<i></i>'.repeat(n) + '</span><span class="go">' + (HZ ? '→' : '↓') + '</span>';
+    document.querySelector(stage).appendChild(el);
+    const txt = el.querySelector('.txt'), dots = [...el.querySelectorAll('.dots i')];
+    return {
+      set(k) {
+        txt.textContent = k < n - 1 ? `${noun} ${k + 1} / ${n} · ${HZ ? 'sigue avanzando' : 'sigue bajando'}` : `${noun} ${n} / ${n} · continúa`;
+        dots.forEach((d, i) => d.classList.toggle('on', i <= k));
+      },
+      toggle(on) {
+        el.classList.toggle('on', on);
+        document.body.classList.toggle('hint-on', !!document.querySelector('.pin-hint.on'));
+      }
+    };
+  }
+
+  // Framework: órbita con nodos (igual en los dos modos)
+  const nombres = ['MIND 4D', 'FOR3CAST', 'FL4ME', 'SPR1NTS', 'BR4ND MIND 4D'];
+  const orbita = document.getElementById('orbita');
+  const nodos = nombres.map((n, i) => {
+    const a = -Math.PI / 2 + i * (2 * Math.PI / nombres.length);
+    const el = document.createElement('span');
+    el.className = 'nodo'; el.textContent = n;
+    el.style.left = (50 + 40 * Math.cos(a)) + '%';
+    el.style.top = (50 + 40 * Math.sin(a)) + '%';
+    orbita.appendChild(el);
+    return el;
+  });
+  const fwItems = [...document.querySelectorAll('.fw-item')];
+  const ringOn = document.getElementById('ringOn');
+  function fwStep(k, prog) {
+    nodos.forEach((n, i) => n.classList.toggle('on', i === k));
+    fwItems.forEach((n, i) => n.classList.toggle('on', i === k));
+    ringOn.setAttribute('stroke-dasharray', `${prog} 1`);
+  }
+  const pasos = [...document.querySelectorAll('.paso')];
+  const counter = el => {
+    const o = { v: 0 }, end = +el.dataset.count, pre = el.dataset.prefix || '';
+    return { o, end, update: () => el.textContent = pre + Math.round(o.v).toLocaleString('es-CL') };
+  };
+
+  if (HZ) horizontal(); else vertical();
+
+  // =====================================================================
+  // Modo horizontal: el scroll vertical (rueda, trackpad, teclado, arrastre) mueve
+  // la franja hacia el lado. Metodología y Fram3work se detienen mientras avanzan sus pasos.
+  // =====================================================================
+  function horizontal() {
+    const track = document.querySelector('main');
+    const space = document.getElementById('hzSpace');
+    const ticks = document.querySelector('.ruler .ticks');
+    const holds = { metodo: 2.2, fw: 3 }; // pantallas de scroll en que la sección queda quieta
+    let pts = [], starts = [], offs = [], hold = {}, total = 0, maxX = 0;
+
+    function layout() {
+      maxX = Math.max(0, track.scrollWidth - innerWidth);
+      offs = sections.map(s => s.offsetLeft);
+      pts = [[0, 0]]; starts = []; hold = {};
+      let s = 0, px = 0;
+      sections.forEach((sec, i) => {
+        const a = Math.min(offs[i], maxX);
+        s += a - px; px = a;
+        starts.push(s); pts.push([s, a]);
+        const h = holds[sec.id];
+        if (h) { hold[sec.id] = [s, s + h * innerHeight]; s += h * innerHeight; pts.push([s, a]); }
+      });
+      s += maxX - px; pts.push([s, maxX]);
+      total = s;
+      space.style.height = (total + innerHeight) + 'px';
+      starts.forEach((st, i) => markEls[i].style.left = (total ? st / total * 100 : 0) + '%');
+    }
+    // posición de scroll → cuánto se corre la franja (tramos lineales, planos en las pausas)
+    function xAt(y) {
+      for (let i = 1; i < pts.length; i++) {
+        const [s0, x0] = pts[i - 1], [s1, x1] = pts[i];
+        if (y <= s1) return s1 === s0 ? x1 : x0 + (x1 - x0) * (y - s0) / (s1 - s0);
+      }
+      return maxX;
+    }
+    const holdP = id => { const [a, b] = hold[id]; return Math.min(1, Math.max(0, (scrollY - a) / (b - a))); };
+
+    jump = i => goTo(starts[i]);
+    layoutMarks = layout;
+    stops = () => {
+      const ys = [...starts];
+      [['metodo', pasos.length], ['fw', nombres.length]].forEach(([id, n]) => {
+        const [a, b] = hold[id];
+        for (let k = 1; k < n; k++) ys.push(a + (b - a) * (k + .5) / n);
+      });
+      ys.push(total);
+      return [...new Set(ys.map(Math.round))].sort((a, b) => a - b);
+    };
+
+    const setX = gsap.quickTo(track, 'x', { duration: .7, ease: 'power3' });
+    const setW = gsap.quickTo(walker, 'x', { duration: .7, ease: 'power3' });
+
+    // Hero → el hombre "sale" del GIF; la franja se lleva la portada
+    const heroTl = gsap.timeline({ paused: true })
+      .to('#heroGif', { scale: 1.12, opacity: 0.15, ease: 'none' }, 0)
+      .to('.hero-copy', { xPercent: 35, opacity: 0, ease: 'none' }, 0)
+      .to('.scroll-hint', { opacity: 0, duration: .2 }, 0)
+      .fromTo(walker, { opacity: 0, yPercent: 30 }, { opacity: 1, yPercent: 0, ease: 'none' }, .45)
+      .to('#brandFixed', { opacity: 1, ease: 'none' }, .6)
+      .to('#ctaFixed', { opacity: 1, y: 0, ease: 'none' }, .6);
+
+    // Entradas de cada sección: se disparan una vez cuando la sección asoma por la derecha
+    const entered = new Set();
+    const enterFx = sections.map(sec => {
+      const tl = gsap.timeline({ paused: true });
+      sec.querySelectorAll('.reveal').forEach(el => {
+        splitWords(el);
+        tl.from(el.querySelectorAll('.w > span'), { yPercent: 110, duration: 1, ease: 'expo.out', stagger: 0.06 }, 0);
+      });
+      sec.querySelectorAll('.reveal-soft').forEach(el => tl.from(el, { y: 30, opacity: 0, duration: 1, ease: 'power3.out' }, .15));
+      const logos = sec.querySelectorAll('.logos img');
+      if (logos.length) tl.from(logos, { y: 24, opacity: 0, stagger: .06, duration: .8, ease: 'power3.out' }, .2);
+      sec.querySelectorAll('[data-count]').forEach(el => {
+        const c = counter(el);
+        tl.to(c.o, { v: c.end, duration: 2, ease: 'power2.out', onUpdate: c.update }, 0);
+      });
+      return tl;
+    });
+    const iCerteza = sections.findIndex(s => s.classList.contains('certeza'));
+    const certezaH2 = sections[iCerteza].querySelector('h2');
+
+    const hint = makeHint('#metodo .stage', pasos.length, 'Paso');
+    const fwHint = makeHint('#fw .stage', nombres.length, 'Módulo');
+
+    // Lo que depende del scroll: franja, aguja, hombre y pasos
+    function onScroll() {
+      const y = scrollY, p = total ? Math.min(1, y / total) : 0;
+      setX(-xAt(y));
+      const tw = ticks.getBoundingClientRect().width;
+      gsap.set(needle, { x: p * tw });
+      const lw = rulerLabel.offsetWidth;
+      gsap.set(rulerLabel, { x: Math.max(0, Math.min(tw - lw, p * tw - lw / 2)) });
+      setW(8 + p * (innerWidth - walker.offsetWidth - 16));
+      face();
+
+      const mq = holdP('metodo');
+      const k1 = Math.min(pasos.length - 1, Math.floor(mq * pasos.length * 0.999 + 0.0001));
+      pasos.forEach((el, i) => el.classList.toggle('on', i <= k1));
+      hint.set(k1);
+      const [ma, mb] = hold.metodo;
+      hint.toggle(y > ma - innerWidth * .3 && y < mb + 2);
+
+      const fq = holdP('fw');
+      const k2 = Math.min(4, Math.floor(fq * 5));
+      fwStep(k2, fq);
+      fwHint.set(k2);
+      const [fa, fb] = hold.fw;
+      fwHint.toggle(y > fa - innerWidth * .3 && y < fb + 2);
+    }
+
+    // Lo que depende de dónde va la franja en pantalla (con su suavizado)
+    function frame() {
+      const x = -gsap.getProperty(track, 'x');
+      heroTl.progress(Math.min(1, x / innerWidth));
+      offs.forEach((o, i) => {
+        if (!entered.has(i) && o - x < innerWidth * .8) { entered.add(i); enterFx[i].play(); }
+      });
+      const c = Math.min(1, Math.max(0, 1 - (offs[iCerteza] - x) / innerWidth));
+      gsap.set(certezaH2, { scale: .7 + .3 * c, letterSpacing: (.2 - .23 * c) + 'em' });
+      let idx = 0;
+      offs.forEach((o, i) => { if (o - x < innerWidth * .5) idx = i; });
+      if (idx !== current || !rulerLabel.dataset.ok) { rulerLabel.dataset.ok = 1; setChapter(idx); }
+    }
+
+    // Arrastrar con el mouse mueve la franja
+    let drag = null;
+    track.addEventListener('pointerdown', e => {
+      if (e.pointerType !== 'mouse' || e.button !== 0 || e.target.closest('a, button')) return;
+      drag = { x: e.clientX, y: scrollY, moved: false };
+    });
+    addEventListener('pointermove', e => {
+      if (!drag) return;
+      const dx = e.clientX - drag.x;
+      if (!drag.moved && Math.abs(dx) > 4) { drag.moved = true; document.documentElement.classList.add('dragging'); }
+      if (drag.moved) scrollTo(0, drag.y - dx * 1.6);
+    });
+    addEventListener('pointerup', () => { drag = null; document.documentElement.classList.remove('dragging'); });
+    addEventListener('dragstart', e => e.preventDefault());
+
+    // Deslizar hacia el lado en el trackpad también avanza
+    addEventListener('wheel', e => {
+      if (menuOpen() || Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+      e.preventDefault();
+      scrollBy(0, e.deltaX);
+    }, { passive: false });
+
+    layout();
+    onScroll();
+    gsap.set(track, { x: -xAt(scrollY) });
+    addEventListener('scroll', onScroll, { passive: true });
+    addEventListener('resize', () => { layout(); onScroll(); });
+    addEventListener('load', () => { layout(); onScroll(); });
+    gsap.ticker.add(frame);
+  }
+
+  // =====================================================================
+  // Modo vertical (celular y movimiento reducido): igual que la versión A
+  // =====================================================================
+  function vertical() {
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Progreso global → aguja y hombre caminando de izquierda a derecha
+    const walkerW = () => walker.getBoundingClientRect().width;
+    ScrollTrigger.create({
+      start: 0, end: 'max',
+      onUpdate: self => {
+        const p = self.progress;
+        // la fila de números se oculta en móvil, así que el ancho se mide en las marcas de la regla
+        const track = document.querySelector('.ruler .ticks').getBoundingClientRect();
+        const nx = p * track.width;
+        gsap.set(needle, { x: nx });
+        const lw = rulerLabel.offsetWidth;
+        gsap.set(rulerLabel, { x: Math.max(0, Math.min(track.width - lw, nx - lw / 2)) });
+        // el hombre avanza por el recorrido
+        gsap.set(walker, { x: 8 + p * (innerWidth - walkerW() - 16) });
+        face();
+        // capítulo activo
+        let idx = 0;
+        sections.forEach((s, i) => { if (s.getBoundingClientRect().top < innerHeight * .5) idx = i; });
+        setChapter(idx);
+      }
+    });
+
+    // Hero → el hombre "sale" del GIF y se convierte en el acompañante
+    gsap.timeline({ scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } })
+      .to('#heroGif', { scale: 1.12, opacity: 0.15, ease: 'none' }, 0)
+      .to('.hero-copy', { yPercent: -30, opacity: 0, ease: 'none' }, 0)
+      .to('.scroll-hint', { opacity: 0, duration: .2 }, 0)
+      .fromTo(walker, { opacity: 0, yPercent: 30 }, { opacity: 1, yPercent: 0, ease: 'none' }, .45)
+      .to('#brandFixed', { opacity: 1, ease: 'none' }, .6)
+      .to('#ctaFixed', { opacity: 1, y: 0, ease: 'none' }, .6);
+
+    // Revelación por palabras
+    document.querySelectorAll('.reveal').forEach(el => {
+      splitWords(el);
+      gsap.from(el.querySelectorAll('.w > span'), {
+        yPercent: 110, duration: 1, ease: 'expo.out', stagger: 0.06,
+        scrollTrigger: { trigger: el, start: 'top 82%' }
+      });
+    });
+    document.querySelectorAll('.reveal-soft').forEach(el => {
+      gsap.from(el, { y: 30, opacity: 0, duration: 1, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 88%' } });
+    });
+
+    // secciones fijas: { st, n, at } → paradas para el teclado
+    const pinned = [];
+
+    // D-3motion: pin y 3 pasos
+    if (!isMobile) {
+      const hint = makeHint('#metodo .stage', pasos.length, 'Paso');
+      hint.set(0);
+      const st = ScrollTrigger.create({
+        trigger: '#metodo', start: 'top top', end: '+=' + innerHeight * 2.2, pin: '#metodo .stage',
+        onToggle: s => hint.toggle(s.isActive),
+        onUpdate: s => {
+          const k = Math.min(pasos.length - 1, Math.floor(s.progress * pasos.length * 0.999 + 0.0001));
+          pasos.forEach((p, i) => p.classList.toggle('on', i <= k));
+          hint.set(k);
+        }
+      });
+      pinned.push({ st, n: pasos.length, at: k => (k + .5) / pasos.length });
+    } else {
+      pasos.forEach(p => p.classList.add('on'));
+    }
+
+    // Framework: pin y 5 módulos
+    const fwHint = makeHint('#fw .stage', nombres.length, 'Módulo');
+    fwStep(0, 0);
+    fwHint.set(0);
+    const fwSt = ScrollTrigger.create({
+      trigger: '#fw', start: 'top top', end: '+=' + innerHeight * (isMobile ? 2.5 : 3), pin: '#fw .stage',
+      onToggle: s => fwHint.toggle(s.isActive),
+      onUpdate: s => {
+        const k = Math.min(4, Math.floor(s.progress * 5));
+        fwStep(k, s.progress);
+        fwHint.set(k);
+      }
+    });
+    pinned.push({ st: fwSt, n: nombres.length, at: k => (k + .5) / nombres.length });
+
+    // Certeza: zoom
+    gsap.fromTo('.certeza h2', { scale: .7, letterSpacing: '.2em' }, {
+      scale: 1, letterSpacing: '-.03em', ease: 'none',
+      scrollTrigger: { trigger: '.certeza', start: 'top bottom', end: 'center center', scrub: true }
+    });
+
+    // Contadores
+    document.querySelectorAll('[data-count]').forEach(el => {
+      const c = counter(el);
+      gsap.to(c.o, { v: c.end, duration: 2, ease: 'power2.out', scrollTrigger: { trigger: el, start: 'top 85%' }, onUpdate: c.update });
+    });
+
+    // Trabajo: scroll horizontal
+    const rail = document.getElementById('rail');
+    const dist = () => Math.max(0, rail.scrollWidth - innerWidth);
+    const nCasos = rail.children.length;
+    const casoHint = makeHint('#trabajo .stage', nCasos, 'Caso');
+    casoHint.set(0);
+    const railTween = gsap.to(rail, {
+      x: () => -dist(), ease: 'none',
+      scrollTrigger: {
+        trigger: '#trabajo', start: 'top top', end: () => '+=' + dist(), pin: '#trabajo .stage', scrub: true, invalidateOnRefresh: true,
+        onToggle: s => casoHint.toggle(s.isActive),
+        onUpdate: s => casoHint.set(Math.round(s.progress * (nCasos - 1)))
+      }
+    });
+    pinned.push({ st: railTween.scrollTrigger, n: nCasos, at: k => k / (nCasos - 1) });
+
+    // cada capítulo + cada paso de las secciones fijas
+    stops = () => {
+      const ys = sections.map(s => s.getBoundingClientRect().top + scrollY);
+      pinned.forEach(({ st, n, at }) => {
+        for (let k = 1; k < n; k++) ys.push(st.start + (st.end - st.start) * at(k));
+      });
+      ys.push(ScrollTrigger.maxScroll(window));
+      return [...new Set(ys.map(Math.round))].sort((a, b) => a - b);
+    };
+
+    // Logos
+    gsap.from('.logos img', { y: 24, opacity: 0, stagger: .06, duration: .8, ease: 'power3.out', scrollTrigger: { trigger: '.logos', start: 'top 85%' } });
+
+    ScrollTrigger.addEventListener('refresh', () => layoutMarks());
+    addEventListener('load', () => ScrollTrigger.refresh());
+    layoutMarks();
+  }
+})();
+</script>
+</body>
+</html>
